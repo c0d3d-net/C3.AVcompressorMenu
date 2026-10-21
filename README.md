@@ -73,27 +73,6 @@ sudo dpkg -i c3avcompressormenu_0.1.0_arm64.deb
 
 ---
 
-## 📂 Directory Structure & `ReadyConv` Destination
-When using **Batch Folder Mode** (Option `2`) or **Single File Mode** (Option `1`) from the menu:
-
-```text
-/MyVideoFolder/
-├── Clip1.mov
-├── Vacation.mkv
-├── Video.mp4
-├── Subfolder/                  <-- Will NOT be scanned
-│   └── ignored.mp4
-└── ReadyConv/                  <-- Automatically created by the menu
-    ├── Clip1.mp4
-    ├── Vacation.mp4
-    └── Video.mp4
-```
-
-- All converted files are safely saved to the `ReadyConv` subfolder within the source folder.
-- Your original files remain 100% untouched.
-
----
-
 ## 🖥️ Main Menu Overview
 
 ```text
@@ -125,4 +104,23 @@ When using **Batch Folder Mode** (Option `2`) or **Single File Mode** (Option `1
   0) 🚪 Exit
 ```
 
+---
+## Update v1.3
+### Summary of Changes
+
+  1. Search Mode Selection (Non-Recursive vs. Recursive):
+     1) Non-Recursive: Searches only the main folder (as before).
+	 2) Recursive: Includes subfolders.
+
+  2. Dynamic Search Depth Configuration (If recursive mode is selected, the user is prompted to specify the desired search depth):
+     - Depth 1: Searches the main folder and all direct subfolders (find -maxdepth 2).
+	 - Depth 2: Searches the main folder, direct subfolders, and their subfolders (find -maxdepth 3).
+     - Depth N: Searches down to the Nth folder level (find -maxdepth $((N + 1))).
+     - 0 / max: Searches all subfolder levels to an unlimited depth.
+
+  3. Automatic dynamic ReadyConv creation per subfolder:
+    - For each file found, the destination folder is dynamically set to $(dirname “$vf”)/ReadyConv.
+    - If a file is located in the subfolder FolderA/Sub1/video.mp4, the converted file is saved in FolderA/Sub1/ReadyConv/video.mp4.
+	- Before batch processing begins and during the processing run, the necessary ReadyConv directories are automatically created in all affected subfolders.
+    - Pruning & Duplicate Prevention: Existing ReadyConv folders are ignored during the find scan using `-name “ReadyConv” -prune` to ensure that files that have already been converted are not re-read as source files.
 ---
